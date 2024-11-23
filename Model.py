@@ -5,8 +5,8 @@ from sklearn.metrics import accuracy_score
 
 def RandomForestModel(SpamData):
     
-    SpamData['text'] = SpamData['text'].apply(lambda x: ' '.join(word.replace('\n', ' ') for word in x.split()))
-    #Removing the \n and treating the words as 2 words
+    SpamData['text'] = SpamData['text'].apply(lambda x: ' '.join(word.replace('\n', ' ') for word in x.split())) #Removing the \n and treating the words as 2 words
+    
     vectorizer = TfidfVectorizer(stop_words='english', max_features=5000)  # You can tune max_features
     X = vectorizer.fit_transform(SpamData['text'])
 
