@@ -107,7 +107,52 @@ def Neural_Model(SpamData):
   print(f'Precision: {precision}')
   print("Predictions:", predictions)
 
-  return model  # Return the trained model
+  return model, vectorizer  # Return the trained model
+
+
+
+
+
+
+
+def MajorityVotingModel(SpamDataTest, rf_model, svm_model, nn_model):
+    """
+    This function makes predictions using three models (Random Forest, SVM, Neural Network) and combines their predictions 
+    using majority voting to return the final prediction.
+    """
+    # Preprocess the test data (same as before)
+    SpamDataTest['text'] = SpamDataTest['text'].apply(lambda x: ' '.join(word.replace('\n', ' ') for word in x.split()))
+    vectorizer = TfidfVectorizer(stop_words='english', max_features=5000)
+    
+    X_test = vectorizer.fit_transform(SpamDataTest['text'])
+    
+    # Step 2: Get predictions from all three models
+    rf_pred = rf_model.predict(X_test)  # Random Forest prediction
+    svm_pred = svm_model.predict(X_test)  # SVM prediction
+    nn_pred = nn_model.predict(X_test)  # Neural Network prediction
+    nn_pred = (nn_pred > 0.5).astype(int).flatten()
+    
+    
+    # Step 3: Combine the predictions using majority voting
+    # Stack the predictions vertically for easier voting
+    predictions = np.column_stack((rf_pred, svm_pred, nn_pred))
+    
+    # Majority voting: Get the mode (most common value) for each instance
+    final_pred = np.array([np.argmax(np.bincount(pred)) for pred in predictions])
+
+    y_test = SpamDataTest["label"]
+    
+    # Step 5: Calculate accuracy and precision
+    accuracy = accuracy_score(y_test, final_pred)  # Accuracy calculation
+    precision = precision_score(y_test, final_pred)  # Precision calculation
+    
+    # Print the results
+    print(f'Accuracy: {accuracy * 100:.2f}%')
+    print(f'Precision: {precision:.2f}')
+    
+    return final_pred  # Return the final predictions
+
+
 
 
 
@@ -122,17 +167,39 @@ def TestModel(SpamDataTest, model):
     X_test = vectorizer.fit_transform(SpamDataTest['text'])
     y_test= SpamDataTest["label"]
     y_pred = model.predict(X_test)
+    y_pred = (y_pred > 0.5).astype(int)
     accuracy = accuracy_score(y_test, y_pred)
     print(f'Accuracy: {accuracy * 100:.2f}%')
+    precision = precision_score(y_test, y_pred)
+    print(f'Precision: {precision}')
+    return y_pred #to save the predictions
+    
+    ##############
     
 def SaveModel(model, name):
     model_pkl_file = name+".pkl"  
     with open(model_pkl_file, 'wb') as file:  
         pickle.dump(model, file)
-
+                
     
 def ReadModel(fileName):
     fileName=fileName+ ".pkl"
     with open(fileName, 'rb') as file:  
         model = pickle.load(file)
         return model
+    
+    
+    ########### These currently for neural, dont really need to save vectorizer but in case
+
+def SaveModel2(objects, filename): 
+    # Save both the model and the vectorizer in the same file
+    with open(filename + ".pkl", 'wb') as file:  
+        pickle.dump(objects, file)
+    print(f"{filename} saved successfully!")
+    
+def ReadModel2(fileName):
+    with open(fileName+ ".pkl", 'rb') as file:
+        saved_objects = pickle.load(file)
+        model = saved_objects['model']
+        vectorizer = saved_objects['vectorizer']
+        return model,vectorizer
