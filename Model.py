@@ -1,19 +1,20 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 import pickle
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import precision_score
+from sklearn.metrics import precision_score, recall_score, confusion_matrix, accuracy_score
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout
 from tensorflow.keras.optimizers import Adam
 import os
+from sklearn.metrics import confusion_matrix
+
 
 #Models
 def RandomForestModel(SpamData):
@@ -39,7 +40,18 @@ def RandomForestModel(SpamData):
     # Step 7: Evaluate the model
     accuracy = accuracy_score(y_test, y_pred)
     print(f'Accuracy: {accuracy * 100:.2f}%')
-    return model
+    precision = precision_score(y_test, y_pred)
+    print(f'Precision: {precision:.2f}')
+    
+    # Calculate recall
+    recall = recall_score(y_test, y_pred)
+    print(f'Recall: {recall:.2f}')
+    
+    # Calculate confusion matrix
+    cm = confusion_matrix(y_test, y_pred)
+    print(f'Confusion Matrix:\n{cm}')
+    
+    return model, y_pred, accuracy, precision, recall, cm
 
 
 def SVM_Model(SpamData):
@@ -64,8 +76,19 @@ def SVM_Model(SpamData):
     # Evaluate the model
     accuracy = accuracy_score(y_test, y_pred)
     print(f"Accuracy:   {accuracy * 100:.2f}%")
+    
+    precision = precision_score(y_test, y_pred)
+    print(f"Precision: {precision:.2f}")
+    
+    # Calculate recall
+    recall = recall_score(y_test, y_pred)
+    print(f"Recall: {recall:.2f}")
+    
+    # Calculate confusion matrix
+    cm = confusion_matrix(y_test, y_pred)
+    print(f"Confusion Matrix:\n{cm}")
 
-    return model
+    return model, y_pred, accuracy, precision, recall, cm
 
 
 def Neural_Model(SpamData):
@@ -106,8 +129,15 @@ def Neural_Model(SpamData):
   precision = precision_score(y_test, predictions)
   print(f'Precision: {precision}')
   print("Predictions:", predictions)
+     # Calculate recall
+  recall = recall_score(y_test, predictions)
+  print(f'Recall: {recall}')
 
-  return model, vectorizer  # Return the trained model
+    # Calculate confusion matrix
+  cm = confusion_matrix(y_test, predictions)
+  print(f'Confusion Matrix:\n{cm}')
+
+  return model, predictions, test_accuracy, precision, recall, cm # Return the trained model
 
 
 
@@ -142,15 +172,18 @@ def MajorityVotingModel(SpamDataTest, rf_model, svm_model, nn_model):
 
     y_test = SpamDataTest["label"]
     
-    # Step 5: Calculate accuracy and precision
     accuracy = accuracy_score(y_test, final_pred)  # Accuracy calculation
     precision = precision_score(y_test, final_pred)  # Precision calculation
+    recall = recall_score(y_test, final_pred)  # Recall calculation
+    cm = confusion_matrix(y_test, final_pred)  # Confusion matrix
     
     # Print the results
     print(f'Accuracy: {accuracy * 100:.2f}%')
     print(f'Precision: {precision:.2f}')
+    print(f'Recall: {recall:.2f}')
+    print(f'Confusion Matrix:\n{cm}')
     
-    return final_pred  # Return the final predictions
+    return final_pred,accuracy,precision, recall, cm# Return the final predictions
 
 
 
