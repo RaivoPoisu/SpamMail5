@@ -16,7 +16,6 @@ The goal of this project is to create a highly accurate spam mail classifier.
 - **Data Analysis:** Data analysis is conducted in the `Analyse` Jupyter notebook.
 - **Python Functions:** Custom functions for training and analysis are located in the `PythonFiles` folder.
 - **Pre-trained Models:** Pre-trained models are stored in the `TrainedModels` folder.
-- **Datasets:** Datasets used for development are stored in the `data` folder, though not all were used in the final implementation.
 
 ---
 
