@@ -38,6 +38,6 @@ The goal of this project is to create a highly accurate spam mail classifier.
 - The project folders are structured as follows:
   - **PythonFiles:** Contains scripts for training and analysis.
   - **TrainedModels:** Includes already trained model files for quick use.
-  - **data:** Stores datasets used during project development.
+  - **DataSets:** Stores datasets used during project development.
 
 
